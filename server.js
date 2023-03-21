@@ -1,31 +1,35 @@
 require('dotenv').config()
 
 const express = require('express')
+var cors = require('cors')
 const mongoose = require('mongoose')
 const workoutRoutes = require('./routes/workouts')
 
+// express app
 const app = express()
 
+// middleware
 app.use(express.json())
 
 app.use((req, res, next) => {
-    console.log(req.path, req.method);
-    next()
+  console.log(req.path, req.method)
+  next()
 })
 
-//route
+app.use(cors())
+
+// routes
 app.use('/api/workouts', workoutRoutes)
 
-//connect db
-mongoose.set("strictQuery", false);
-mongoose.connect(process.env.MONG_URI)
-    .then(() => {
-        // listen for requests
-        app.listen(process.env.PORT, () => {
-            console.log('listening on port', process.env.PORT)
-        })
+// connect to db
+mongoose.connect(process.env.MONGO_URI)
+  .then(() => {
+    console.log('connected to database')
+    // listen to port
+    app.listen(process.env.PORT, () => {
+      console.log('listening for requests on port', process.env.PORT)
     })
-    .catch(e => {
-        console.log(e);
-    })
-
+  })
+  .catch((err) => {
+    console.log(err)
+  }) 
